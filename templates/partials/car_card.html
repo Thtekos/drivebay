@@ -1,0 +1,25 @@
+{% load static %}
+<a href="/cars/{{ car.id }}/" class="text-decoration-none">
+    <div class="car-card">
+        {% if car.image %}
+            <img src="{{ car.image.url }}" alt="{{ car }}">
+        {% else %}
+            <div class="no-image-placeholder">
+                <i class="bi bi-car-front" style="font-size: 2rem;"></i>
+            </div>
+        {% endif %}
+        <div class="car-card-body">
+            <div class="car-card-title">{{ car.year }} {{ car.make }} {{ car.car_model }}</div>
+            <div class="car-card-price">€{{ car.price|floatformat:0 }}</div>
+            <div class="car-card-meta">
+                <span><i class="bi bi-speedometer2 me-1"></i>{{ car.mileage|floatformat:0 }} km</span>
+                <span><i class="bi bi-fuel-pump me-1"></i>{{ car.get_fuel_type_display }}</span>
+                <span><i class="bi bi-gear me-1"></i>{{ car.get_transmission_display }}</span>
+            </div>
+            <div class="mt-2 d-flex gap-2">
+                <span class="badge-fuel">{{ car.get_fuel_type_display }}</span>
+                <span class="badge-condition">{{ car.get_condition_display }}</span>
+            </div>
+        </div>
+    </div>
+</a>

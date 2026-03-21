@@ -1,0 +1,95 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}DriveBay — Find Your Next Car{% endblock %}
+
+{% block content %}
+
+<!-- Hero section -->
+<section class="hero">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-7">
+                <h1>Find Your <span>Perfect Car</span><br>At The Right Price</h1>
+                <p>Browse thousands of verified used cars from trusted sellers across Greece.</p>
+                <div class="d-flex gap-3 mt-4">
+                    <a href="/cars/" class="btn btn-accent btn-lg">
+                        <i class="bi bi-search me-2"></i>Browse Cars
+                    </a>
+                    {% if not user.is_authenticated %}
+                    <a href="/register/" class="btn btn-outline-accent btn-lg">
+                        <i class="bi bi-person-plus me-2"></i>Register Free
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Browse by make -->
+<section class="py-5">
+    <div class="container">
+        <h2 class="section-title">Browse by <span>Brand</span></h2>
+        <div class="row g-3">
+            {% for make in makes %}
+            <div class="col-6 col-sm-4 col-md-3 col-lg-2">
+                <a href="/cars/?make={{ make.id }}" class="text-decoration-none">
+                    <div class="car-card text-center p-3">
+                        {% if make.logo %}
+                            <img src="{{ make.logo.url }}" alt="{{ make.name }}"
+                                 style="height:50px; width:auto; object-fit:contain; margin-bottom:0.5rem;">
+                        {% else %}
+                            <i class="bi bi-car-front text-accent" style="font-size:2rem;"></i>
+                        {% endif %}
+                        <div style="font-size:0.85rem; font-weight:600; color:var(--text-primary); margin-top:0.5rem;">
+                            {{ make.name }}
+                        </div>
+                    </div>
+                </a>
+            </div>
+            {% empty %}
+            <p style="color:var(--text-muted);">No brands available yet.</p>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<!-- Featured listings -->
+<section class="py-5" style="background-color: var(--bg-secondary);">
+    <div class="container">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2 class="section-title mb-0">Latest <span>Listings</span></h2>
+            <a href="/cars/" class="btn btn-outline-accent btn-sm">View All</a>
+        </div>
+        <div class="row g-4">
+            {% for car in featured_cars %}
+            <div class="col-sm-6 col-lg-3">
+                {% include 'partials/car_card.html' %}
+            </div>
+            {% empty %}
+            <p style="color:var(--text-muted);">No listings available yet.</p>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<!-- Why DriveBay -->
+<section class="py-5">
+    <div class="container">
+        <h2 class="section-title text-center">Why <span>DriveBay</span>?</h2>
+        <div class="row g-4 mt-2">
+            {% for item in why_items %}
+            <div class="col-md-4 text-center">
+                <div class="car-card p-4">
+                    <i class="bi {{ item.icon }} text-accent" style="font-size:2.5rem;"></i>
+                    <h5 class="mt-3" style="color:var(--text-primary);">{{ item.title }}</h5>
+                    <p style="color:var(--text-secondary); font-size:0.9rem;">{{ item.desc }}</p>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+{% endblock %}
