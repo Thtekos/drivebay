@@ -1,0 +1,121 @@
+{% load static %}
+<div class="car-card p-4" style="position: sticky; top: 1rem;">
+    <h6 style="color: var(--text-primary); font-weight: 600; margin-bottom: 1rem;">
+        <i class="bi bi-funnel me-2 text-accent"></i>Filter Cars
+    </h6>
+
+    <form id="filter-form" method="GET" action="/cars/">
+
+        <!-- Search -->
+        <div class="mb-3">
+            <label class="form-label">Search</label>
+            <input type="text" name="q" class="form-control"
+                placeholder="Make or model..." value="{{ query }}">
+        </div>
+
+        <!-- Make -->
+        <div class="mb-3">
+            <label class="form-label">Brand</label>
+            <select name="make" class="form-select">
+                <option value="">All Brands</option>
+                {% for make in makes %}
+                <option value="{{ make.id }}" {% if selected_make == make.id|stringformat:"s" %}selected{% endif %}>
+                    {{ make.name }}
+                </option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <!-- Fuel -->
+        <div class="mb-3">
+            <label class="form-label">Fuel Type</label>
+            <select name="fuel" class="form-select">
+                <option value="">All Fuel Types</option>
+                {% for value, label in fuel_choices %}
+                <option value="{{ value }}" {% if selected_fuel == value %}selected{% endif %}>
+                    {{ label }}
+                </option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <!-- Transmission -->
+        <div class="mb-3">
+            <label class="form-label">Transmission</label>
+            <select name="transmission" class="form-select">
+                <option value="">Any</option>
+                {% for value, label in transmission_choices %}
+                <option value="{{ value }}" {% if selected_transmission == value %}selected{% endif %}>
+                    {{ label }}
+                </option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <!-- Color -->
+        <div class="mb-3">
+            <label class="form-label">Color</label>
+            <select name="color" class="form-select">
+                <option value="">Any Color</option>
+                {% for value, label in color_choices %}
+                <option value="{{ value }}" {% if selected_color == value %}selected{% endif %}>
+                    {{ label }}
+                </option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <!-- Condition -->
+        <div class="mb-3">
+            <label class="form-label">Condition</label>
+            <select name="condition" class="form-select">
+                <option value="">Any Condition</option>
+                {% for value, label in condition_choices %}
+                <option value="{{ value }}" {% if selected_condition == value %}selected{% endif %}>
+                    {{ label }}
+                </option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <!-- Price range -->
+        <div class="mb-3">
+            <label class="form-label">Price Range (€)</label>
+            <div class="d-flex gap-2">
+                <input type="number" name="min_price" class="form-control"
+                    placeholder="Min" value="{{ min_price }}">
+                <input type="number" name="max_price" class="form-control"
+                    placeholder="Max" value="{{ max_price }}">
+            </div>
+        </div>
+
+        <!-- Year range -->
+        <div class="mb-3">
+            <label class="form-label">Year Range</label>
+            <div class="d-flex gap-2">
+                <input type="number" name="min_year" class="form-control"
+                    placeholder="From" value="{{ min_year }}">
+                <input type="number" name="max_year" class="form-control"
+                    placeholder="To" value="{{ max_year }}">
+            </div>
+        </div>
+
+        <!-- Max mileage -->
+        <div class="mb-3">
+            <label class="form-label">Max Mileage (km)</label>
+            <input type="number" name="max_mileage" class="form-control"
+                placeholder="e.g. 100000" value="{{ max_mileage }}">
+        </div>
+
+        <!-- Buttons -->
+        <div class="d-flex gap-2">
+            <button type="submit" class="btn btn-accent w-100">
+                <i class="bi bi-search me-1"></i>Apply
+            </button>
+            <a href="/cars/" class="btn btn-dark-outline w-100">
+                <i class="bi bi-x-lg me-1"></i>Reset
+            </a>
+        </div>
+
+    </form>
+</div>
