@@ -33,7 +33,10 @@ def car_list(request):
     # Filter by make
     make_id = request.GET.get('make', '')
     if make_id:
-        cars = cars.filter(make__id=make_id)
+        try:
+            cars = cars.filter(make__id=int(make_id))
+        except ValueError:
+            pass
 
     # Filter by fuel type
     fuel = request.GET.get('fuel', '')

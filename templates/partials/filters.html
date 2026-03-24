@@ -19,7 +19,7 @@
             <select name="make" class="form-select">
                 <option value="">All Brands</option>
                 {% for make in makes %}
-                <option value="{{ make.id }}" {% if selected_make == make.id|stringformat:"s" %}selected{% endif %}>
+                <option value="{{ make.id }}" {% if selected_make == make.id|stringformat:"i" %}selected{% endif %}>
                     {{ make.name }}
                 </option>
                 {% endfor %}
