@@ -1,5 +1,9 @@
-from django.shortcuts import render, get_object_or_404
-from .models import Car, Make, CarModel, ViewHistory
+from django.shortcuts import render, get_object_or_404, redirect
+from .models import Car, Make, CarModel, ViewHistory, UserProfile
+from django.contrib.auth import login, logout, authenticate
+from django.contrib.auth.models import User
+from django.contrib.auth.decorators import login_required
+from django.contrib import messages
 
 def home(request):
     featured_cars = Car.objects.filter(is_available=True)[:8]
@@ -149,3 +153,88 @@ def car_detail(request, car_id):
         'rating_range': range(1, 6),
     }
     return render(request, 'car_detail.html', context)
+
+def register_view(request):
+    # Redirect if already logged in
+    if request.user.is_authenticated:
+        return redirect('home')
+
+    if request.method == 'POST':
+        username = request.POST.get('username', '').strip()
+        email = request.POST.get('email', '').strip()
+        first_name = request.POST.get('first_name', '').strip()
+        last_name = request.POST.get('last_name', '').strip()
+        password1 = request.POST.get('password1', '')
+        password2 = request.POST.get('password2', '')
+        phone = request.POST.get('phone', '').strip()
+        location = request.POST.get('location', '').strip()
+
+        # Validation
+        errors = []
+        if not username:
+            errors.append('Username is required.')
+        elif User.objects.filter(username=username).exists():
+            errors.append('Username is already taken.')
+        if not email:
+            errors.append('Email is required.')
+        elif User.objects.filter(email=email).exists():
+            errors.append('Email is already registered.')
+        if len(password1) < 8:
+            errors.append('Password must be at least 8 characters.')
+        if password1 != password2:
+            errors.append('Passwords do not match.')
+
+        if errors:
+            for error in errors:
+                messages.error(request, error)
+            return render(request, 'register.html', {'form_data': request.POST})
+
+        # Create user
+        user = User.objects.create_user(
+            username=username,
+            email=email,
+            password=password1,
+            first_name=first_name,
+            last_name=last_name,
+        )
+
+        # Create profile
+        UserProfile.objects.create(
+            user=user,
+            phone=phone,
+            location=location,
+        )
+
+        login(request, user)
+        messages.success(request, f'Welcome to DriveBay, {first_name or username}!')
+        return redirect('home')
+
+    return render(request, 'register.html', {})
+
+
+def login_view(request):
+    # Redirect if already logged in
+    if request.user.is_authenticated:
+        return redirect('home')
+
+    if request.method == 'POST':
+        username = request.POST.get('username', '').strip()
+        password = request.POST.get('password', '')
+        user = authenticate(request, username=username, password=password)
+
+        if user is not None:
+            login(request, user)
+            messages.success(request, f'Welcome back, {user.first_name or user.username}!')
+            next_url = request.GET.get('next', '/')
+            return redirect(next_url)
+        else:
+            messages.error(request, 'Invalid username or password.')
+            return render(request, 'login.html', {'username': username})
+
+    return render(request, 'login.html', {})
+
+
+def logout_view(request):
+    logout(request)
+    messages.success(request, 'You have been logged out.')
+    return redirect('home')

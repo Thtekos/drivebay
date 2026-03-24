@@ -1,0 +1,95 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Register — DriveBay{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-7 col-lg-6">
+            <div class="car-card p-4 p-md-5">
+
+                <div class="text-center mb-4">
+                    <a href="/" style="font-size: 1.8rem; font-weight: 700; color: var(--accent);">
+                        Drive<span style="color: var(--text-primary);">Bay</span>
+                    </a>
+                    <h5 class="mt-3" style="color: var(--text-primary);">Create your account</h5>
+                    <p style="color: var(--text-muted); font-size: 0.875rem;">Join thousands of car buyers and sellers</p>
+                </div>
+
+                <form method="POST" action="/register/" id="register-form">
+                    {% csrf_token %}
+
+                    <div class="row g-3">
+
+                        <div class="col-6">
+                            <label class="form-label">First Name</label>
+                            <input type="text" name="first_name" class="form-control"
+                                value="{{ form_data.first_name|default:'' }}" placeholder="John">
+                        </div>
+
+                        <div class="col-6">
+                            <label class="form-label">Last Name</label>
+                            <input type="text" name="last_name" class="form-control"
+                                value="{{ form_data.last_name|default:'' }}" placeholder="Doe">
+                        </div>
+
+                        <div class="col-12">
+                            <label class="form-label">Username <span style="color:var(--danger);">*</span></label>
+                            <input type="text" name="username" class="form-control" required
+                                value="{{ form_data.username|default:'' }}" placeholder="johndoe">
+                        </div>
+
+                        <div class="col-12">
+                            <label class="form-label">Email <span style="color:var(--danger);">*</span></label>
+                            <input type="email" name="email" class="form-control" required
+                                value="{{ form_data.email|default:'' }}" placeholder="john@example.com">
+                        </div>
+
+                        <div class="col-12">
+                            <label class="form-label">Phone</label>
+                            <input type="tel" name="phone" class="form-control"
+                                value="{{ form_data.phone|default:'' }}" placeholder="+30 69...">
+                        </div>
+
+                        <div class="col-12">
+                            <label class="form-label">Location</label>
+                            <input type="text" name="location" class="form-control"
+                                value="{{ form_data.location|default:'' }}" placeholder="Athens, Greece">
+                        </div>
+
+                        <div class="col-12">
+                            <label class="form-label">Password <span style="color:var(--danger);">*</span></label>
+                            <input type="password" name="password1" class="form-control" required
+                                placeholder="At least 8 characters" id="password1">
+                        </div>
+
+                        <div class="col-12">
+                            <label class="form-label">Confirm Password <span style="color:var(--danger);">*</span></label>
+                            <input type="password" name="password2" class="form-control" required
+                                placeholder="Repeat your password" id="password2">
+                            <div id="password-match-msg" class="mt-1" style="font-size:0.8rem;"></div>
+                        </div>
+
+                        <div class="col-12 mt-2">
+                            <button type="submit" class="btn btn-accent w-100">
+                                <i class="bi bi-person-plus me-2"></i>Create Account
+                            </button>
+                        </div>
+
+                    </div>
+                </form>
+
+                <div class="text-center mt-3" style="font-size: 0.875rem; color: var(--text-muted);">
+                    Already have an account? <a href="/login/">Login here</a>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script defer src="{% static 'js/register.js' %}"></script>
+{% endblock %}
