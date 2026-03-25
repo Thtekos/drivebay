@@ -355,3 +355,13 @@ a:hover {
     color: var(--text-muted);
     font-size: 0.85rem;
 }
+
+/* Prevent cards from stretching in flex/grid rows */
+.row > [class*="col"] {
+    display: flex;
+    flex-direction: column;
+}
+
+.row > [class*="col"] > .car-card {
+    flex: 0 1 auto;
+}

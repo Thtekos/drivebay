@@ -241,3 +241,61 @@ def logout_view(request):
     logout(request)
     messages.success(request, 'You have been logged out.')
     return redirect('home')
+
+@login_required
+def profile_view(request):
+    profile, created = UserProfile.objects.get_or_create(user=request.user)
+
+    if request.method == 'POST':
+        # Update user fields
+        request.user.first_name = request.POST.get('first_name', '').strip()
+        request.user.last_name = request.POST.get('last_name', '').strip()
+        request.user.email = request.POST.get('email', '').strip()
+        request.user.save()
+
+        # Update profile fields
+        profile.phone = request.POST.get('phone', '').strip()
+        profile.location = request.POST.get('location', '').strip()
+        profile.bio = request.POST.get('bio', '').strip()
+
+        if 'avatar' in request.FILES:
+            profile.avatar = request.FILES['avatar']
+
+        profile.save()
+        messages.success(request, 'Profile updated successfully.')
+        return redirect('profile')
+
+    context = {
+        'profile': profile,
+    }
+    return render(request, 'profile.html', context)
+
+@login_required
+def change_password_view(request):
+    if request.method == 'POST':
+        current_password = request.POST.get('current_password', '')
+        new_password1 = request.POST.get('new_password1', '')
+        new_password2 = request.POST.get('new_password2', '')
+
+        # Validate current password
+        if not request.user.check_password(current_password):
+            messages.error(request, 'Current password is incorrect.')
+            return redirect('profile')
+
+        if len(new_password1) < 8:
+            messages.error(request, 'New password must be at least 8 characters.')
+            return redirect('profile')
+
+        if new_password1 != new_password2:
+            messages.error(request, 'New passwords do not match.')
+            return redirect('profile')
+
+        request.user.set_password(new_password1)
+        request.user.save()
+
+        # Re-login after password change
+        login(request, request.user)
+        messages.success(request, 'Password updated successfully.')
+        return redirect('profile')
+
+    return redirect('profile')
