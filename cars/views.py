@@ -299,3 +299,52 @@ def change_password_view(request):
         return redirect('profile')
 
     return redirect('profile')
+
+@login_required
+def dashboard_view(request):
+    profile, created = UserProfile.objects.get_or_create(user=request.user)
+
+    # Recently viewed cars
+    view_history = ViewHistory.objects.filter(
+        user=request.user
+    ).select_related('car').order_by('-viewed_at')[:6]
+
+    # Wishlist
+    wishlist = request.user.wishlist.select_related('car').order_by('-added_at')[:6]
+
+    # Purchases
+    purchases = request.user.purchases.select_related('car').order_by('-purchased_at')[:6]
+
+    # Reviews given
+    reviews = request.user.reviews.select_related('car').order_by('-created_at')[:5]
+
+    # Cart items
+    cart_items = request.user.cart_items.select_related('car').order_by('-added_at')
+
+    # Stats
+    stats = {
+        'viewed': ViewHistory.objects.filter(user=request.user).count(),
+        'wishlist': request.user.wishlist.count(),
+        'purchases': request.user.purchases.count(),
+        'reviews': request.user.reviews.count(),
+    }
+    
+    stats_list = [
+        ('Cars Viewed', 'bi-clock-history', stats['viewed']),
+        ('Wishlist', 'bi-heart', stats['wishlist']),
+        ('Purchases', 'bi-bag-check', stats['purchases']),
+        ('Reviews', 'bi-star', stats['reviews']),
+    ]
+
+    context = {
+        'profile': profile,
+        'view_history': view_history,
+        'wishlist': wishlist,
+        'purchases': purchases,
+        'reviews': reviews,
+        'cart_items': cart_items,
+        'stats': stats,
+        'stats_list': stats_list,
+        'rating_range': range(1, 6),
+    }
+    return render(request, 'dashboard.html', context)

@@ -365,3 +365,9 @@ a:hover {
 .row > [class*="col"] > .car-card {
     flex: 0 1 auto;
 }
+
+/* Dashboard car row hover */
+.dashboard-car-row:hover {
+    background-color: var(--bg-secondary) !important;
+    border-color: var(--accent);
+}
