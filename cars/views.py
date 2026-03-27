@@ -4,6 +4,7 @@ from django.contrib.auth import login, logout, authenticate
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
+from .decorators import admin_required, login_required_redirect
 
 def home(request):
     featured_cars = Car.objects.filter(is_available=True)[:8]
@@ -242,7 +243,7 @@ def logout_view(request):
     messages.success(request, 'You have been logged out.')
     return redirect('home')
 
-@login_required
+@login_required_redirect
 def profile_view(request):
     profile, created = UserProfile.objects.get_or_create(user=request.user)
 
@@ -270,7 +271,7 @@ def profile_view(request):
     }
     return render(request, 'profile.html', context)
 
-@login_required
+@login_required_redirect
 def change_password_view(request):
     if request.method == 'POST':
         current_password = request.POST.get('current_password', '')
@@ -300,7 +301,7 @@ def change_password_view(request):
 
     return redirect('profile')
 
-@login_required
+@login_required_redirect
 def dashboard_view(request):
     profile, created = UserProfile.objects.get_or_create(user=request.user)
 
