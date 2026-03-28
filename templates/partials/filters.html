@@ -7,10 +7,24 @@
     <form id="filter-form" method="GET" action="/cars/">
 
         <!-- Search -->
-        <div class="mb-3">
+        <div class="mb-3" style="position:relative;">
             <label class="form-label">Search</label>
             <input type="text" name="q" class="form-control"
-                placeholder="Make or model..." value="{{ query }}">
+                placeholder="Make or model..." value="{{ query }}"
+                autocomplete="off">
+            <div id="search-suggestions" style="
+                display:none;
+                position:absolute;
+                top:100%;
+                left:0;
+                right:0;
+                background:var(--bg-card);
+                border:1px solid var(--border);
+                border-radius:var(--radius);
+                z-index:100;
+                margin-top:4px;
+                overflow:hidden;
+            "></div>
         </div>
 
         <!-- Make -->

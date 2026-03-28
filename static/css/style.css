@@ -371,3 +371,22 @@ a:hover {
     background-color: var(--bg-secondary) !important;
     border-color: var(--accent);
 }
+
+/* Search suggestion dropdown */
+.suggestion-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.6rem 1rem;
+    cursor: pointer;
+    transition: var(--transition);
+    border-bottom: 1px solid var(--border);
+}
+
+.suggestion-item:last-child {
+    border-bottom: none;
+}
+
+.suggestion-item:hover {
+    background-color: var(--bg-input);
+}

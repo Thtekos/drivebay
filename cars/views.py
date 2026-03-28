@@ -5,6 +5,7 @@ from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from .decorators import admin_required, login_required_redirect
+from django.db import models
 
 def home(request):
     featured_cars = Car.objects.filter(is_available=True)[:8]
@@ -349,3 +350,24 @@ def dashboard_view(request):
         'rating_range': range(1, 6),
     }
     return render(request, 'dashboard.html', context)
+
+from django.http import JsonResponse
+
+def search_suggestions(request):
+    query = request.GET.get('q', '').strip()
+    results = []
+    if len(query) >= 2:
+        cars = Car.objects.filter(
+            is_available=True
+        ).filter(
+            models.Q(make__name__icontains=query) |
+            models.Q(car_model__name__icontains=query)
+        ).values('id', 'make__name', 'car_model__name', 'year', 'price')[:6]
+
+        for car in cars:
+            results.append({
+                'id': car['id'],
+                'label': f"{car['year']} {car['make__name']} {car['car_model__name']}",
+                'price': f"€{int(car['price']):,}",
+            })
+    return JsonResponse({'results': results})
