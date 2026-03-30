@@ -1,0 +1,28 @@
+<div class="col-lg-2">
+    <div class="car-card p-3" style="position:sticky; top:1rem; height:fit-content;">
+        <div style="font-size:0.75rem; color:var(--text-muted); font-weight:600;
+                    text-transform:uppercase; letter-spacing:0.5px; margin-bottom:0.75rem;">
+            Admin Panel
+        </div>
+        {% with path=request.path %}
+        <nav style="display:flex; flex-direction:column; gap:4px;">
+            <a href="/management/" class="mgmt-nav-link {% if path == '/management/' %}active{% endif %}">
+                <i class="bi bi-speedometer2"></i>Dashboard
+            </a>
+            <a href="/management/cars/" class="mgmt-nav-link {% if '/management/cars' in path %}active{% endif %}">
+                <i class="bi bi-car-front"></i>Cars
+            </a>
+            <a href="/management/categories/" class="mgmt-nav-link {% if '/management/categories' in path %}active{% endif %}">
+                <i class="bi bi-tags"></i>Categories
+            </a>
+            <a href="/management/users/" class="mgmt-nav-link {% if '/management/users' in path %}active{% endif %}">
+                <i class="bi bi-people"></i>Users
+            </a>
+            <hr style="border-color:var(--border); margin:0.5rem 0;">
+            <a href="/" class="mgmt-nav-link">
+                <i class="bi bi-house"></i>Back to Site
+            </a>
+        </nav>
+        {% endwith %}
+    </div>
+</div>

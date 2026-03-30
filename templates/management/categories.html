@@ -1,0 +1,148 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Manage Categories — DriveBay{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row g-4">
+
+        {% include 'partials/management_sidebar.html' %}
+
+        <div class="col-lg-10">
+            <h2 class="section-title mb-4">Manage <span>Categories</span></h2>
+
+            <div class="row g-4">
+
+                <!-- Brands -->
+                <div class="col-lg-6">
+                    <div class="car-card p-4" style="height:fit-content;">
+                        <h6 style="color:var(--text-primary); font-weight:600; margin-bottom:1rem;">
+                            <i class="bi bi-car-front text-accent me-2"></i>Brands
+                        </h6>
+
+                        <!-- Add brand form -->
+                        <form method="POST" action="/management/categories/make/add/"
+                            enctype="multipart/form-data" class="mb-3">
+                            {% csrf_token %}
+                            <div class="d-flex gap-2 mb-2">
+                                <input type="text" name="name" class="form-control form-control-sm"
+                                    placeholder="Brand name" required>
+                                <input type="text" name="country" class="form-control form-control-sm"
+                                    placeholder="Country">
+                            </div>
+                            <button type="submit" class="btn btn-accent btn-sm">
+                                <i class="bi bi-plus-lg me-1"></i>Add Brand
+                            </button>
+                        </form>
+
+                        <table class="mgmt-table">
+                            <thead>
+                                <tr>
+                                    <th>Brand</th>
+                                    <th>Country</th>
+                                    <th>Cars</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for make in makes %}
+                                <tr>
+                                    <td><strong>{{ make.name }}</strong></td>
+                                    <td>{{ make.country|default:"—" }}</td>
+                                    <td>{{ make.car_count }}</td>
+                                    <td>
+                                        <form method="POST"
+                                            action="/management/categories/make/{{ make.id }}/delete/"
+                                            class="d-inline delete-make-form">
+                                            {% csrf_token %}
+                                            <button type="submit" class="btn btn-sm"
+                                                    style="border:1.5px solid var(--danger); color:var(--danger);"
+                                                    {% if make.car_count > 0 %}disabled title="Has cars"{% endif %}>
+                                                <i class="bi bi-trash"></i>
+                                            </button>
+                                        </form>
+                                    </td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="4" style="color:var(--text-muted); text-align:center;">
+                                        No brands yet.
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Models -->
+                <div class="col-lg-6">
+                    <div class="car-card p-4" style="height:fit-content;">
+                        <h6 style="color:var(--text-primary); font-weight:600; margin-bottom:1rem;">
+                            <i class="bi bi-diagram-3 text-accent me-2"></i>Models
+                        </h6>
+
+                        <!-- Add model form -->
+                        <form method="POST" action="/management/categories/model/add/" class="mb-3">
+                            {% csrf_token %}
+                            <div class="d-flex gap-2 mb-2">
+                                <select name="make" class="form-select form-select-sm" required>
+                                    <option value="">Select Brand</option>
+                                    {% for make in makes %}
+                                    <option value="{{ make.id }}">{{ make.name }}</option>
+                                    {% endfor %}
+                                </select>
+                                <input type="text" name="name" class="form-control form-control-sm"
+                                    placeholder="Model name" required>
+                            </div>
+                            <button type="submit" class="btn btn-accent btn-sm">
+                                <i class="bi bi-plus-lg me-1"></i>Add Model
+                            </button>
+                        </form>
+
+                        <table class="mgmt-table">
+                            <thead>
+                                <tr>
+                                    <th>Model</th>
+                                    <th>Brand</th>
+                                    <th>Cars</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for model in car_models %}
+                                <tr>
+                                    <td><strong>{{ model.name }}</strong></td>
+                                    <td>{{ model.make.name }}</td>
+                                    <td>{{ model.car_count }}</td>
+                                    <td>
+                                        <form method="POST"
+                                            action="/management/categories/model/{{ model.id }}/delete/"
+                                            class="d-inline">
+                                            {% csrf_token %}
+                                            <button type="submit" class="btn btn-sm"
+                                                    style="border:1.5px solid var(--danger); color:var(--danger);"
+                                                    {% if model.car_count > 0 %}disabled title="Has cars"{% endif %}>
+                                                <i class="bi bi-trash"></i>
+                                            </button>
+                                        </form>
+                                    </td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="4" style="color:var(--text-muted); text-align:center;">
+                                        No models yet.
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

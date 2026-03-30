@@ -1,0 +1,79 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Manage Users — DriveBay{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row g-4">
+
+        {% include 'partials/management_sidebar.html' %}
+
+        <div class="col-lg-10">
+            <h2 class="section-title mb-4">Manage <span>Users</span></h2>
+
+            <!-- Search -->
+            <div class="car-card p-3 mb-4">
+                <form method="GET" action="/management/users/">
+                    <div class="d-flex gap-2">
+                        <input type="text" name="q" class="form-control"
+                            placeholder="Search by username or email..." value="{{ query }}">
+                        <button type="submit" class="btn btn-accent">Search</button>
+                        {% if query %}
+                        <a href="/management/users/" class="btn btn-dark-outline">Clear</a>
+                        {% endif %}
+                    </div>
+                </form>
+            </div>
+
+            <div class="car-card p-0" style="overflow:hidden;">
+                <table class="mgmt-table">
+                    <thead>
+                        <tr>
+                            <th>Username</th>
+                            <th>Full Name</th>
+                            <th>Email</th>
+                            <th>Joined</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for u in users %}
+                        <tr>
+                            <td><strong>{{ u.username }}</strong></td>
+                            <td>{{ u.get_full_name|default:"—" }}</td>
+                            <td>{{ u.email }}</td>
+                            <td>{{ u.date_joined|date:"d M Y" }}</td>
+                            <td>
+                                {% if u.is_active %}
+                                    <span style="color:var(--success);">Active</span>
+                                {% else %}
+                                    <span style="color:var(--danger);">Inactive</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <form method="POST"
+                                    action="/management/users/{{ u.id }}/toggle/">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-sm btn-dark-outline">
+                                        {% if u.is_active %}Deactivate{% else %}Activate{% endif %}
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="6" style="text-align:center; color:var(--text-muted); padding:2rem;">
+                                No users found.
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+        </div>
+    </div>
+</div>
+{% endblock %}

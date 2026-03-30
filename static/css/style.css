@@ -390,3 +390,69 @@ a:hover {
 .suggestion-item:hover {
     background-color: var(--bg-input);
 }
+
+/* Management sidebar navigation */
+.mgmt-nav-link {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 0.5rem 0.75rem;
+    border-radius: var(--radius);
+    color: var(--text-secondary);
+    font-size: 0.875rem;
+    font-weight: 500;
+    text-decoration: none;
+    transition: var(--transition);
+}
+
+.mgmt-nav-link:hover {
+    background-color: var(--bg-input);
+    color: var(--text-primary);
+}
+
+.mgmt-nav-link.active {
+    background-color: rgba(232, 163, 23, 0.15);
+    color: var(--accent);
+}
+
+.mgmt-nav-link i {
+    font-size: 1rem;
+    width: 16px;
+}
+
+/* Management table */
+.mgmt-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.875rem;
+}
+
+.mgmt-table th {
+    color: var(--text-muted);
+    font-weight: 600;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    padding: 0.75rem 1rem;
+    border-bottom: 1px solid var(--border);
+    text-align: left;
+}
+
+.mgmt-table td {
+    padding: 0.75rem 1rem;
+    border-bottom: 1px solid var(--border);
+    color: var(--text-secondary);
+    vertical-align: middle;
+}
+
+.mgmt-table tr:last-child td {
+    border-bottom: none;
+}
+
+.mgmt-table tr:hover td {
+    background-color: var(--bg-input);
+}
+
+.mgmt-table td strong {
+    color: var(--text-primary);
+}

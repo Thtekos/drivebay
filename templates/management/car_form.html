@@ -1,0 +1,183 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ action }} Car — DriveBay{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row g-4">
+
+        {% include 'partials/management_sidebar.html' %}
+
+        <div class="col-lg-10">
+            <div class="d-flex align-items-center gap-3 mb-4">
+                <a href="/management/cars/" class="btn btn-dark-outline btn-sm">
+                    <i class="bi bi-arrow-left"></i>
+                </a>
+                <h2 class="section-title mb-0">{{ action }} <span>Car</span></h2>
+            </div>
+
+            <div class="car-card p-4" style="height:fit-content;">
+                <form method="POST" enctype="multipart/form-data" id="car-form">
+                    {% csrf_token %}
+                    <div class="row g-3">
+
+                        <div class="col-md-6">
+                            <label class="form-label">Brand <span style="color:var(--danger);">*</span></label>
+                            <select name="make" class="form-select" id="make-select" required>
+                                <option value="">Select Brand</option>
+                                {% for make in makes %}
+                                <option value="{{ make.id }}"
+                                    {% if car.make_id == make.id or form_data.make == make.id|stringformat:"s" %}
+                                    selected{% endif %}>
+                                    {{ make.name }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label">Model <span style="color:var(--danger);">*</span></label>
+                            <select name="car_model" class="form-select" id="model-select" required>
+                                <option value="">Select Model</option>
+                                {% for model in car_models %}
+                                <option value="{{ model.id }}"
+                                        data-make="{{ model.make_id }}"
+                                    {% if car.car_model_id == model.id or form_data.car_model == model.id|stringformat:"s" %}
+                                    selected{% endif %}>
+                                    {{ model.name }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <div class="col-md-3">
+                            <label class="form-label">Year <span style="color:var(--danger);">*</span></label>
+                            <input type="number" name="year" class="form-control" required
+                                min="1990" max="2025"
+                                value="{{ car.year|default:form_data.year|default:'' }}">
+                        </div>
+
+                        <div class="col-md-3">
+                            <label class="form-label">Price (€) <span style="color:var(--danger);">*</span></label>
+                            <input type="number" name="price" class="form-control" required
+                                min="0" step="0.01"
+                                value="{{ car.price|default:form_data.price|default:'' }}">
+                        </div>
+
+                        <div class="col-md-3">
+                            <label class="form-label">Mileage (km) <span style="color:var(--danger);">*</span></label>
+                            <input type="number" name="mileage" class="form-control" required
+                                min="0"
+                                value="{{ car.mileage|default:form_data.mileage|default:'' }}">
+                        </div>
+
+                        <div class="col-md-3">
+                            <label class="form-label">Fuel Type</label>
+                            <select name="fuel_type" class="form-select">
+                                {% for value, label in fuel_choices %}
+                                <option value="{{ value }}"
+                                    {% if car.fuel_type == value or form_data.fuel_type == value %}
+                                    selected{% endif %}>
+                                    {{ label }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <div class="col-md-4">
+                            <label class="form-label">Transmission</label>
+                            <select name="transmission" class="form-select">
+                                {% for value, label in transmission_choices %}
+                                <option value="{{ value }}"
+                                    {% if car.transmission == value or form_data.transmission == value %}
+                                    selected{% endif %}>
+                                    {{ label }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <div class="col-md-4">
+                            <label class="form-label">Color</label>
+                            <select name="color" class="form-select">
+                                {% for value, label in color_choices %}
+                                <option value="{{ value }}"
+                                    {% if car.color == value or form_data.color == value %}
+                                    selected{% endif %}>
+                                    {{ label }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <div class="col-md-4">
+                            <label class="form-label">Condition</label>
+                            <select name="condition" class="form-select">
+                                {% for value, label in condition_choices %}
+                                <option value="{{ value }}"
+                                    {% if car.condition == value or form_data.condition == value %}
+                                    selected{% endif %}>
+                                    {{ label }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <div class="col-12">
+                            <label class="form-label">Description</label>
+                            <textarea name="description" class="form-control" rows="4"
+                                    placeholder="Describe the car...">{{ car.description|default:form_data.description|default:'' }}</textarea>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label">Car Image</label>
+                            {% if car.image %}
+                                <div class="mb-2">
+                                    <img src="{{ car.image.url }}" alt="Current image"
+                                        style="height:80px; border-radius:var(--radius); object-fit:cover;">
+                                </div>
+                            {% endif %}
+                            <input type="file" name="image" accept="image/*"
+                                id="car-image-input" style="display:none;">
+                            <div style="display:flex; align-items:center; gap:0.75rem;">
+                                <button type="button" class="btn btn-outline-accent btn-sm"
+                                        id="car-image-btn">
+                                    Upload Image
+                                </button>
+                                <span id="car-image-filename" style="font-size:0.8rem; color:var(--text-muted);">
+                                    No file selected
+                                </span>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6 d-flex align-items-end">
+                            <div class="form-check">
+                                <input type="checkbox" name="is_available" class="form-check-input"
+                                    id="is-available"
+                                    {% if car.is_available or not car %}checked{% endif %}>
+                                <label class="form-check-label" for="is-available"
+                                    style="color:var(--text-secondary);">
+                                    Available for sale
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="col-12 mt-2">
+                            <button type="submit" class="btn btn-accent">
+                                <i class="bi bi-check-lg me-2"></i>{{ action }} Car
+                            </button>
+                            <a href="/management/cars/" class="btn btn-dark-outline ms-2">Cancel</a>
+                        </div>
+
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script defer src="{% static 'js/management.js' %}"></script>
+{% endblock %}
