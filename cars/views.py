@@ -6,6 +6,9 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from .decorators import admin_required, login_required_redirect
 from django.db import models
+from django.views.decorators.http import require_POST
+from django.http import JsonResponse
+
 
 def home(request):
     featured_cars = Car.objects.filter(is_available=True)[:8]
@@ -351,8 +354,6 @@ def dashboard_view(request):
     }
     return render(request, 'dashboard.html', context)
 
-from django.http import JsonResponse
-
 def search_suggestions(request):
     query = request.GET.get('q', '').strip()
     results = []
@@ -371,3 +372,36 @@ def search_suggestions(request):
                 'price': f"€{int(car['price']):,}",
             })
     return JsonResponse({'results': results})
+
+@login_required_redirect
+@require_POST
+def submit_review(request, car_id):
+    car = get_object_or_404(Car, id=car_id)
+
+    # Check if user already reviewed this car
+    if Review.objects.filter(car=car, user=request.user).exists():
+        return JsonResponse({'success': False, 'error': 'You have already reviewed this car.'})
+
+    try:
+        rating = int(request.POST.get('rating', 0))
+        if rating < 1 or rating > 5:
+            return JsonResponse({'success': False, 'error': 'Rating must be between 1 and 5.'})
+    except ValueError:
+        return JsonResponse({'success': False, 'error': 'Invalid rating value.'})
+
+    comment = request.POST.get('comment', '').strip()
+
+    Review.objects.create(
+        car=car,
+        user=request.user,
+        rating=rating,
+        comment=comment,
+    )
+
+    return JsonResponse({
+        'success': True,
+        'message': 'Review submitted successfully.',
+        'rating': rating,
+        'username': request.user.username,
+        'comment': comment,
+    })

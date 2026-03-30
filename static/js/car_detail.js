@@ -9,13 +9,11 @@ $(document).ready(function () {
     if (stars.length > 0) {
         stars.forEach(function (star) {
             star.addEventListener('mouseenter', function () {
-                const value = parseInt(this.dataset.value);
-                highlightStars(value);
+                highlightStars(parseInt(this.dataset.value));
             });
 
             star.addEventListener('mouseleave', function () {
-                const current = parseInt(ratingInput.value);
-                highlightStars(current);
+                highlightStars(parseInt(ratingInput.value));
             });
 
             star.addEventListener('click', function () {
@@ -66,8 +64,34 @@ $(document).ready(function () {
                 },
                 success: function (response) {
                     if (response.success) {
-                        showMessage('#review-message', 'Review submitted successfully!', 'success');
-                        setTimeout(function () { location.reload(); }, 1200);
+                        showMessage('#review-message', 'Review submitted!', 'success');
+
+                        // Build star HTML for new review
+                        let starsHtml = '';
+                        for (let i = 1; i <= 5; i++) {
+                            const filled = i <= response.rating ? '-fill' : '';
+                            starsHtml += `<i class="bi bi-star${filled} text-accent" style="font-size:0.9rem;"></i>`;
+                        }
+
+                        // Build new review HTML and prepend to reviews list
+                        const newReview = `
+                            <div class="mb-3 p-3" style="background:var(--bg-input); border-radius:var(--radius);">
+                                <div class="d-flex justify-content-between align-items-center mb-1">
+                                    <strong style="color:var(--text-primary);">${response.username}</strong>
+                                    <span style="color:var(--text-muted); font-size:0.8rem;">Just now</span>
+                                </div>
+                                <div class="mb-1">${starsHtml}</div>
+                                ${response.comment ? `<p style="color:var(--text-secondary); font-size:0.9rem; margin:0;">${response.comment}</p>` : ''}
+                            </div>`;
+
+                        const reviewsList = document.querySelector('#reviews-list');
+                        if (reviewsList) {
+                            reviewsList.insertAdjacentHTML('afterbegin', newReview);
+                        }
+
+                        // Hide the form
+                        reviewForm.closest('div').style.display = 'none';
+
                     } else {
                         showMessage('#review-message', response.error, 'danger');
                     }
@@ -83,9 +107,8 @@ $(document).ready(function () {
     const cartBtn = document.querySelector('#add-to-cart');
     if (cartBtn) {
         cartBtn.addEventListener('click', function () {
-            const carId = this.dataset.carId;
             $.ajax({
-                url: '/cart/add/' + carId + '/',
+                url: '/cart/add/' + this.dataset.carId + '/',
                 method: 'POST',
                 data: { csrfmiddlewaretoken: getCsrf() },
                 success: function (response) {
@@ -103,9 +126,8 @@ $(document).ready(function () {
     const wishlistBtn = document.querySelector('#add-to-wishlist');
     if (wishlistBtn) {
         wishlistBtn.addEventListener('click', function () {
-            const carId = this.dataset.carId;
             $.ajax({
-                url: '/wishlist/add/' + carId + '/',
+                url: '/wishlist/add/' + this.dataset.carId + '/',
                 method: 'POST',
                 data: { csrfmiddlewaretoken: getCsrf() },
                 success: function (response) {
