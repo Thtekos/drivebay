@@ -24,7 +24,7 @@ class CarModel(models.Model):
     name = models.CharField(max_length=100)
 
     def __str__(self):
-        return f"{self.make.name} {self.name}"
+        return self.name
 
     class Meta:
         ordering = ['make', 'name']
