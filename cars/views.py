@@ -494,3 +494,12 @@ def wishlist_remove(request, car_id):
     car = get_object_or_404(Car, id=car_id)
     request.user.wishlist.filter(car=car).delete()
     return JsonResponse({'success': True})
+
+def error_403(request, exception=None):
+    return render(request, '403.html', status=403)
+
+def error_404(request, exception=None):
+    return render(request, '404.html', status=404)
+
+def error_500(request):
+    return render(request, '500.html', status=500)

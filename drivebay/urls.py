@@ -8,3 +8,8 @@ urlpatterns = [
 ]
 
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+
+# Custom error handlers
+handler403 = 'cars.views.error_403'
+handler404 = 'cars.views.error_404'
+handler500 = 'cars.views.error_500'
