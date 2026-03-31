@@ -13,4 +13,10 @@ urlpatterns = [
     path('profile/', views.profile_view, name='profile'),
     path('profile/change-password/', views.change_password_view, name='change_password'),
     path('dashboard/', views.dashboard_view, name='dashboard'),
+    path('cart/', views.cart_view, name='cart'),
+    path('cart/add/<int:car_id>/', views.cart_add, name='cart_add'),
+    path('cart/remove/<int:car_id>/', views.cart_remove, name='cart_remove'),
+    path('cart/checkout/', views.cart_checkout, name='cart_checkout'),
+    path('wishlist/add/<int:car_id>/', views.wishlist_add, name='wishlist_add'),
+    path('wishlist/remove/<int:car_id>/', views.wishlist_remove, name='wishlist_remove'),
 ]

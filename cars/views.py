@@ -8,6 +8,7 @@ from .decorators import admin_required, login_required_redirect
 from django.db import models
 from django.views.decorators.http import require_POST
 from django.http import JsonResponse
+from .models import Car, Make, CarModel, ViewHistory, UserProfile, Review, CartItem, Wishlist
 
 
 def home(request):
@@ -405,3 +406,91 @@ def submit_review(request, car_id):
         'username': request.user.username,
         'comment': comment,
     })
+    
+@login_required_redirect
+def cart_view(request):
+    cart_items = request.user.cart_items.select_related('car').order_by('-added_at')
+    total = sum(item.car.price for item in cart_items)
+    context = {
+        'cart_items': cart_items,
+        'total': total,
+    }
+    return render(request, 'cart.html', context)
+
+
+@login_required_redirect
+@require_POST
+def cart_add(request, car_id):
+    car = get_object_or_404(Car, id=car_id, is_available=True)
+
+    # Check if already in cart
+    if request.user.cart_items.filter(car=car).exists():
+        return JsonResponse({'success': False, 'error': 'This car is already in your cart.'})
+
+    CartItem.objects.create(user=request.user, car=car)
+    cart_count = request.user.cart_items.count()
+    return JsonResponse({'success': True, 'cart_count': cart_count})
+
+
+@login_required_redirect
+@require_POST
+def cart_remove(request, car_id):
+    car = get_object_or_404(Car, id=car_id)
+    request.user.cart_items.filter(car=car).delete()
+    cart_count = request.user.cart_items.count()
+
+    # Recalculate total
+    cart_items = request.user.cart_items.select_related('car').all()
+    total = sum(item.car.price for item in cart_items)
+
+    return JsonResponse({
+        'success': True,
+        'cart_count': cart_count,
+        'total': f"{total:,.0f}",
+    })
+
+
+@login_required_redirect
+@require_POST
+def cart_checkout(request):
+    from .models import Purchase
+    cart_items = request.user.cart_items.select_related('car').all()
+
+    if not cart_items.exists():
+        messages.error(request, 'Your cart is empty.')
+        return redirect('cart')
+
+    # Simulate purchase for each cart item
+    for item in cart_items:
+        Purchase.objects.get_or_create(
+            user=request.user,
+            car=item.car,
+            defaults={'price_paid': item.car.price},
+        )
+        # Mark car as unavailable
+        item.car.is_available = False
+        item.car.save()
+
+    # Clear the cart
+    request.user.cart_items.all().delete()
+    messages.success(request, 'Purchase completed! Thank you for using DriveBay.')
+    return redirect('dashboard')
+
+@login_required_redirect
+@require_POST
+def wishlist_add(request, car_id):
+    car = get_object_or_404(Car, id=car_id)
+
+    if request.user.wishlist.filter(car=car).exists():
+        return JsonResponse({'success': False, 'error': 'Already in your wishlist.'})
+
+    Wishlist.objects.create(user=request.user, car=car)
+    return JsonResponse({'success': True})
+
+
+@login_required_redirect
+@require_POST
+def wishlist_remove(request, car_id):
+    car = get_object_or_404(Car, id=car_id)
+    request.user.wishlist.filter(car=car).delete()
+    return JsonResponse({'success': True})

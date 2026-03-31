@@ -65,11 +65,12 @@ def management_car_add(request):
             return render(request, 'management/car_form.html', {
                 'makes': makes,
                 'car_models': car_models,
-                'form_data': request.POST,
                 'fuel_choices': Car.FUEL_CHOICES,
                 'transmission_choices': Car.TRANSMISSION_CHOICES,
                 'color_choices': Car.COLOR_CHOICES,
                 'condition_choices': Car.CONDITION_CHOICES,
+                'action': 'Add',
+                'form_data': {},
             })
 
         car = Car(
@@ -117,12 +118,12 @@ def management_car_edit(request, car_id):
                 'car': car,
                 'makes': makes,
                 'car_models': car_models,
-                'form_data': request.POST,
                 'fuel_choices': Car.FUEL_CHOICES,
                 'transmission_choices': Car.TRANSMISSION_CHOICES,
                 'color_choices': Car.COLOR_CHOICES,
                 'condition_choices': Car.CONDITION_CHOICES,
                 'action': 'Edit',
+                'form_data': {},
             })
 
         car.make_id = request.POST.get('make')
