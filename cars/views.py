@@ -10,6 +10,7 @@ from django.views.decorators.http import require_POST
 from django.http import JsonResponse
 from .models import Car, Make, CarModel, ViewHistory, UserProfile, Review, CartItem, Wishlist
 from django.db.models import Q
+import bleach
 
 
 def home(request):
@@ -192,10 +193,10 @@ def register_view(request):
         return redirect('home')
 
     if request.method == 'POST':
-        username = request.POST.get('username', '').strip()
-        email = request.POST.get('email', '').strip()
-        first_name = request.POST.get('first_name', '').strip()
-        last_name = request.POST.get('last_name', '').strip()
+        username = bleach.clean(request.POST.get('username', '').strip())
+        email = bleach.clean(request.POST.get('email', '').strip())
+        first_name = bleach.clean(request.POST.get('first_name', '').strip())
+        last_name = bleach.clean(request.POST.get('last_name', '').strip())
         password1 = request.POST.get('password1', '')
         password2 = request.POST.get('password2', '')
         phone = request.POST.get('phone', '').strip()
@@ -243,23 +244,29 @@ def register_view(request):
 
     return render(request, 'register.html', {})
 
-
 def login_view(request):
-    # Redirect if already logged in
     if request.user.is_authenticated:
         return redirect('home')
 
     if request.method == 'POST':
+        # Simple brute force check using session
+        attempts = request.session.get('login_attempts', 0)
+        if attempts >= 10:
+            messages.error(request, 'Too many failed login attempts. Please try again later.')
+            return render(request, 'login.html', {})
+
         username = request.POST.get('username', '').strip()
         password = request.POST.get('password', '')
         user = authenticate(request, username=username, password=password)
 
         if user is not None:
             login(request, user)
+            request.session['login_attempts'] = 0
             messages.success(request, f'Welcome back, {user.first_name or user.username}!')
             next_url = request.GET.get('next', '/')
             return redirect(next_url)
         else:
+            request.session['login_attempts'] = attempts + 1
             messages.error(request, 'Invalid username or password.')
             return render(request, 'login.html', {'username': username})
 
@@ -413,7 +420,7 @@ def submit_review(request, car_id):
     except ValueError:
         return JsonResponse({'success': False, 'error': 'Invalid rating value.'})
 
-    comment = request.POST.get('comment', '').strip()
+    comment = bleach.clean(request.POST.get('comment', '').strip())
 
     Review.objects.create(
         car=car,
