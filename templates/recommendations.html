@@ -1,0 +1,64 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Recommended For You — DriveBay{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
+        <div>
+            <h2 class="section-title mb-1">
+                Recommended <span>For You</span>
+            </h2>
+            <p style="color:var(--text-muted); font-size:0.9rem;">
+                Based on your browsing history — {{ viewed_count }} car{{ viewed_count|pluralize }} viewed
+            </p>
+        </div>
+        <a href="/cars/" class="btn btn-outline-accent btn-sm">
+            <i class="bi bi-search me-1"></i>Browse All Cars
+        </a>
+    </div>
+
+    <!-- Preferences summary -->
+    {% if preferred_makes %}
+    <div class="car-card p-3 mb-4">
+        <div style="display:flex; align-items:center; gap:1rem; flex-wrap:wrap;">
+            <span style="font-size:0.8rem; color:var(--text-muted); font-weight:600;">
+                YOUR PREFERENCES
+            </span>
+            {% for make in preferred_makes %}
+            <span class="badge-fuel">{{ make.name }}</span>
+            {% endfor %}
+            {% for fuel in preferred_fuels %}
+            <span class="badge-condition">{{ fuel|title }}</span>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Recommended cars grid -->
+    {% if recommended_cars %}
+    <div class="row g-4">
+        {% for car in recommended_cars %}
+        <div class="col-sm-6 col-lg-3">
+            {% include 'partials/car_card.html' %}
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="text-center py-5">
+        <div class="car-card p-5 d-inline-block">
+            <i class="bi bi-stars text-accent" style="font-size:4rem;"></i>
+            <h5 class="mt-3" style="color:var(--text-primary);">No recommendations yet</h5>
+            <p style="color:var(--text-muted);">{{ reason }}</p>
+            <a href="/cars/" class="btn btn-accent mt-3">
+                <i class="bi bi-car-front me-2"></i>Start Browsing
+            </a>
+        </div>
+    </div>
+    {% endif %}
+
+</div>
+{% endblock %}

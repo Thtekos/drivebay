@@ -9,6 +9,7 @@ from django.db import models
 from django.views.decorators.http import require_POST
 from django.http import JsonResponse
 from .models import Car, Make, CarModel, ViewHistory, UserProfile, Review, CartItem, Wishlist
+from django.db.models import Q
 
 
 def home(request):
@@ -19,10 +20,32 @@ def home(request):
         {'icon': 'bi-cash-coin', 'title': 'Best Prices', 'desc': 'Compare thousands of cars and find the best deal.'},
         {'icon': 'bi-headset', 'title': '24/7 Support', 'desc': 'Our team is always here to help you find your car.'},
     ]
+
+    # Personalized recommendations for logged in users
+    recommended_cars = []
+    if request.user.is_authenticated:
+        viewed = ViewHistory.objects.filter(
+            user=request.user
+        ).select_related('car').order_by('-viewed_at')[:10]
+
+        if viewed.exists():
+            viewed_ids = [v.car.id for v in viewed]
+            preferred_makes = list(set([v.car.make_id for v in viewed]))
+            preferred_fuels = list(set([v.car.fuel_type for v in viewed]))
+            recommended_cars = Car.objects.filter(
+                is_available=True
+            ).exclude(
+                id__in=viewed_ids
+            ).filter(
+                Q(make_id__in=preferred_makes) |
+                Q(fuel_type__in=preferred_fuels)
+            ).distinct().order_by('-created_at')[:4]
+
     context = {
         'featured_cars': featured_cars,
         'makes': makes,
         'why_items': why_items,
+        'recommended_cars': recommended_cars,
     }
     return render(request, 'home.html', context)
 
@@ -503,3 +526,56 @@ def error_404(request, exception=None):
 
 def error_500(request):
     return render(request, '500.html', status=500)
+
+@login_required_redirect
+def recommendations_view(request):
+    # Get user's view history
+    viewed = ViewHistory.objects.filter(
+        user=request.user
+    ).select_related('car').order_by('-viewed_at')[:20]
+
+    if not viewed.exists():
+        context = {
+            'recommended_cars': [],
+            'reason': 'Start browsing cars to get personalized recommendations.',
+        }
+        return render(request, 'recommendations.html', context)
+
+    # Extract preferences from view history
+    viewed_car_ids = [v.car.id for v in viewed]
+    preferred_makes = list(set([v.car.make_id for v in viewed]))
+    preferred_fuels = list(set([v.car.fuel_type for v in viewed]))
+
+    # Calculate average price range from viewed cars
+    prices = [float(v.car.price) for v in viewed]
+    avg_price = sum(prices) / len(prices)
+    min_price = avg_price * 0.5
+    max_price = avg_price * 1.5
+
+    # Build recommendation query
+    # Score: same make > same fuel > price range
+    recommended = Car.objects.filter(
+        is_available=True
+    ).exclude(
+        id__in=viewed_car_ids
+    ).filter(
+        Q(make_id__in=preferred_makes) |
+        Q(fuel_type__in=preferred_fuels) |
+        Q(price__gte=min_price, price__lte=max_price)
+    ).distinct().order_by('-created_at')[:12]
+
+    # If not enough results broaden the search
+    if recommended.count() < 4:
+        recommended = Car.objects.filter(
+            is_available=True
+        ).exclude(
+            id__in=viewed_car_ids
+        ).order_by('-created_at')[:12]
+
+    context = {
+        'recommended_cars': recommended,
+        'viewed_count': len(viewed_car_ids),
+        'preferred_makes': Make.objects.filter(id__in=preferred_makes),
+        'preferred_fuels': preferred_fuels,
+    }
+    return render(request, 'recommendations.html', context)
