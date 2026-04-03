@@ -146,18 +146,6 @@ X_FRAME_OPTIONS = 'DENY'
 SESSION_COOKIE_HTTPONLY = True
 CSRF_COOKIE_HTTPONLY = True
 
-import dj_database_url
-
-# Whitenoise for static files
+# Static files for production
 MIDDLEWARE.insert(1, 'whitenoise.middleware.WhiteNoiseMiddleware')
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
-
-# Production database
-DATABASE_URL = os.environ.get('DATABASE_URL')
-if DATABASE_URL:
-    DATABASES['default'] = dj_database_url.parse(DATABASE_URL)
-
-# Production security
-if not DEBUG:
-    SECRET_KEY = os.environ.get('SECRET_KEY', SECRET_KEY)
-    ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS', '').split(',')
