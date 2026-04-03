@@ -1,6 +1,9 @@
 asgiref==3.11.1
 bleach==6.3.0
 Django==5.2
+gunicorn==25.3.0
+packaging==26.0
 pillow==12.2.0
 sqlparse==0.5.5
 webencodings==0.5.1
+whitenoise==6.12.0
