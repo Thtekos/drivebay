@@ -62,7 +62,7 @@
                     <i class="bi bi-heart text-accent me-2"></i>Wishlist
                 </h6>
                 {% for item in wishlist %}
-                    {% with car=item.car %}
+                    {% with car=item.car show_remove_wishlist=True %}
                         {% include 'partials/dashboard_car_row.html' %}
                     {% endwith %}
                 {% empty %}

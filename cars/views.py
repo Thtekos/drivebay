@@ -523,7 +523,10 @@ def wishlist_add(request, car_id):
 def wishlist_remove(request, car_id):
     car = get_object_or_404(Car, id=car_id)
     request.user.wishlist.filter(car=car).delete()
-    return JsonResponse({'success': True})
+    # Handle both AJAX and regular form POST
+    if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+        return JsonResponse({'success': True})
+    return redirect('dashboard')
 
 def error_403(request, exception=None):
     return render(request, '403.html', status=403)

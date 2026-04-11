@@ -66,6 +66,10 @@ $(document).ready(function () {
                     if (response.success) {
                         showMessage('#review-message', 'Review submitted!', 'success');
 
+                        // Hide no reviews message
+                        const noReviewsMsg = document.querySelector('#no-reviews-msg');
+                        if (noReviewsMsg) noReviewsMsg.remove();
+
                         // Build star HTML for new review
                         let starsHtml = '';
                         for (let i = 1; i <= 5; i++) {

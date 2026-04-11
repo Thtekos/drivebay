@@ -126,9 +126,10 @@
                         <p style="color: var(--text-secondary); font-size: 0.9rem; margin: 0;">{{ review.comment }}</p>
                         {% endif %}
                     </div>
-                    {% empty %}
-                    <p style="color: var(--text-muted); font-size: 0.9rem;">No reviews yet. Be the first!</p>
                     {% endfor %}
+                    {% if not reviews %}
+                    <p id="no-reviews-msg" style="color: var(--text-muted); font-size: 0.9rem;">No reviews yet. Be the first!</p>
+                    {% endif %}
                 </div>
             </div>
 
