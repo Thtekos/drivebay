@@ -161,6 +161,7 @@ class ViewHistory(models.Model):
     class Meta:
         unique_together = ['user', 'car']
         ordering = ['-viewed_at']
+        verbose_name_plural = 'View histories'
 
 
 # PURCHASE
