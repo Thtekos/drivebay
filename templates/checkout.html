@@ -1,0 +1,219 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Checkout — DriveBay{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row g-4 justify-content-center">
+
+        <!-- Checkout form -->
+        <div class="col-lg-7">
+            <h2 class="section-title mb-4">Complete <span>Purchase</span></h2>
+
+            <form method="POST" action="/cart/process/" id="checkout-form">
+                {% csrf_token %}
+
+                <!-- Personal details -->
+                <div class="car-card p-4 mb-4">
+                    <h6 style="color:var(--text-primary); font-weight:600; margin-bottom:1.25rem;">
+                        <i class="bi bi-person text-accent me-2"></i>Personal Details
+                    </h6>
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label">First Name</label>
+                            <input type="text" class="form-control" required
+                                value="{{ user.first_name }}" placeholder="John">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Last Name</label>
+                            <input type="text" class="form-control" required
+                                value="{{ user.last_name }}" placeholder="Doe">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Email</label>
+                            <input type="email" class="form-control" required
+                                value="{{ user.email }}" placeholder="john@example.com">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Phone</label>
+                            <input type="tel" class="form-control"
+                                value="{{ user.profile.phone|default:'' }}"
+                                placeholder="+30 69...">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Billing address -->
+                <div class="car-card p-4 mb-4">
+                    <h6 style="color:var(--text-primary); font-weight:600; margin-bottom:1.25rem;">
+                        <i class="bi bi-geo-alt text-accent me-2"></i>Billing Address
+                    </h6>
+                    <div class="row g-3">
+                        <div class="col-12">
+                            <label class="form-label">Street Address</label>
+                            <input type="text" class="form-control" required
+                                placeholder="123 Main Street">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">City</label>
+                            <input type="text" class="form-control" required
+                                placeholder="Athens">
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">Postal Code</label>
+                            <input type="text" class="form-control" required
+                                placeholder="10431">
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">Country</label>
+                            <input type="text" class="form-control"
+                                value="Greece" required>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Payment details -->
+                <div class="car-card p-4 mb-4">
+                    <h6 style="color:var(--text-primary); font-weight:600; margin-bottom:1.25rem;">
+                        <i class="bi bi-credit-card text-accent me-2"></i>Payment Details
+                        <span style="font-size:0.75rem; color:var(--text-muted); font-weight:400;">
+                            (Simulated — no real transaction)
+                        </span>
+                    </h6>
+                    <div class="row g-3">
+                        <div class="col-12">
+                            <label class="form-label">Cardholder Name</label>
+                            <input type="text" class="form-control" required
+                                placeholder="John Doe" id="cardholder-name">
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label">Card Number</label>
+                            <div style="position:relative;">
+                                <input type="text" class="form-control" required
+                                    placeholder="1234 5678 9012 3456"
+                                    maxlength="19" id="card-number">
+                                <i class="bi bi-credit-card"
+                                style="position:absolute; right:1rem; top:50%;
+                                        transform:translateY(-50%);
+                                        color:var(--text-muted);"></i>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Expiry Date</label>
+                            <input type="text" class="form-control" required
+                                placeholder="MM/YY" maxlength="5" id="expiry-date">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">CVV</label>
+                            <div style="position:relative;">
+                                <input type="text" class="form-control" required
+                                    placeholder="123" maxlength="3" id="cvv">
+                                <i class="bi bi-question-circle"
+                                style="position:absolute; right:1rem; top:50%;
+                                        transform:translateY(-50%);
+                                        color:var(--text-muted); cursor:help;"
+                                title="3-digit security code on the back of your card"></i>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Accepted cards -->
+                    <div class="d-flex gap-2 mt-3 align-items-center">
+                        <span style="font-size:0.75rem; color:var(--text-muted);">Accepted:</span>
+                        {% for card in 'VISA,Mastercard,PayPal,Amex'|make_list %}{% endfor %}
+                        <span style="background:var(--bg-input); border:1px solid var(--border);
+                                    border-radius:6px; padding:3px 10px; font-size:0.75rem;
+                                    color:var(--text-secondary); font-weight:600;">VISA</span>
+                        <span style="background:var(--bg-input); border:1px solid var(--border);
+                                    border-radius:6px; padding:3px 10px; font-size:0.75rem;
+                                    color:var(--text-secondary); font-weight:600;">Mastercard</span>
+                        <span style="background:var(--bg-input); border:1px solid var(--border);
+                                    border-radius:6px; padding:3px 10px; font-size:0.75rem;
+                                    color:var(--text-secondary); font-weight:600;">PayPal</span>
+                        <span style="background:var(--bg-input); border:1px solid var(--border);
+                                    border-radius:6px; padding:3px 10px; font-size:0.75rem;
+                                    color:var(--text-secondary); font-weight:600;">Amex</span>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn btn-accent w-100 btn-lg">
+                    <i class="bi bi-bag-check me-2"></i>
+                    Complete Purchase — €{{ total|floatformat:0 }}
+                </button>
+                <p style="text-align:center; color:var(--text-muted);
+                        font-size:0.8rem; margin-top:0.75rem;">
+                    <i class="bi bi-shield-lock me-1"></i>
+                    Simulated purchase only. No real payment will be processed.
+                </p>
+
+            </form>
+        </div>
+
+        <!-- Order summary -->
+        <div class="col-lg-4">
+            <div class="car-card p-4" style="height:fit-content;">
+                <h6 style="color:var(--text-primary); font-weight:600; margin-bottom:1.25rem;">
+                    <i class="bi bi-receipt text-accent me-2"></i>Order Summary
+                </h6>
+                {% for item in cart_items %}
+                <div style="display:flex; align-items:center; gap:0.75rem;
+                            padding:0.75rem 0; border-bottom:1px solid var(--border);">
+                    {% if item.car.image %}
+                        <img src="{{ item.car.image.url }}" alt="{{ item.car }}"
+                            style="width:60px; height:42px; object-fit:cover;
+                                    border-radius:6px; flex-shrink:0;">
+                    {% else %}
+                        <div style="width:60px; height:42px; background:var(--bg-input);
+                                    border-radius:6px; display:flex; align-items:center;
+                                    justify-content:center; flex-shrink:0;">
+                            <i class="bi bi-car-front" style="color:var(--text-muted);"></i>
+                        </div>
+                    {% endif %}
+                    <div style="flex:1; min-width:0;">
+                        <div style="font-size:0.85rem; font-weight:600;
+                                    color:var(--text-primary); white-space:nowrap;
+                                    overflow:hidden; text-overflow:ellipsis;">
+                            {{ item.car }}
+                        </div>
+                        <div style="font-size:0.85rem; color:var(--accent);">
+                            €{{ item.car.price|floatformat:0 }}
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+
+                <div class="d-flex justify-content-between align-items-center pt-3">
+                    <span style="font-weight:600; color:var(--text-primary);">Total</span>
+                    <span style="font-weight:700; color:var(--accent); font-size:1.2rem;">
+                        €{{ total|floatformat:0 }}
+                    </span>
+                </div>
+
+                <hr class="divider">
+
+                <div style="font-size:0.8rem; color:var(--text-muted);">
+                    <div class="d-flex align-items-center gap-2 mb-2">
+                        <i class="bi bi-shield-check text-accent"></i>
+                        Secure simulated transaction
+                    </div>
+                    <div class="d-flex align-items-center gap-2 mb-2">
+                        <i class="bi bi-arrow-counterclockwise text-accent"></i>
+                        Cancel anytime before confirmation
+                    </div>
+                    <div class="d-flex align-items-center gap-2">
+                        <i class="bi bi-headset text-accent"></i>
+                        24/7 customer support
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script defer src="{% static 'js/checkout.js' %}"></script>
+{% endblock %}

@@ -589,3 +589,16 @@ def recommendations_view(request):
         'preferred_fuels': preferred_fuels,
     }
     return render(request, 'recommendations.html', context)
+
+@login_required_redirect
+def checkout_view(request):
+    cart_items = request.user.cart_items.select_related('car').order_by('-added_at')
+    if not cart_items.exists():
+        messages.error(request, 'Your cart is empty.')
+        return redirect('cart')
+    total = sum(item.car.price for item in cart_items)
+    context = {
+        'cart_items': cart_items,
+        'total': total,
+    }
+    return render(request, 'checkout.html', context)
