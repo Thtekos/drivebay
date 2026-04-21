@@ -13,6 +13,7 @@
 
         <!-- Cart items -->
         <div class="col-lg-8">
+            {% csrf_token %}
             <div class="car-card p-0" style="overflow:hidden;" id="cart-container">
                 {% for item in cart_items %}
                 <div class="cart-item" id="cart-item-{{ item.car.id }}"
