@@ -2,6 +2,39 @@
 
 $(document).ready(function () {
 
+    // Helper: update navbar cart badge
+    function updateNavCartBadge(count) {
+        const cartLink = document.querySelector('.navbar a[href="/cart/"]');
+        if (!cartLink) return;
+        let badge = cartLink.querySelector('.badge');
+        if (count > 0) {
+            if (badge) {
+                badge.textContent = count;
+            } else {
+                badge = document.createElement('span');
+                badge.className = 'badge bg-warning text-dark ms-1';
+                badge.textContent = count;
+                cartLink.appendChild(badge);
+            }
+        } else {
+            if (badge) badge.remove();
+        }
+    }
+
+    // Helper: show message
+    function showMessage(selector, text, type) {
+        const el = document.querySelector(selector);
+        if (!el) return;
+        el.style.display = 'block';
+        el.className = 'alert alert-' + type + ' mt-2';
+        el.textContent = text;
+    }
+
+    // Helper: get CSRF token
+    function getCsrf() {
+        return document.querySelector('[name=csrfmiddlewaretoken]').value;
+    }
+
     // Star rating hover and click
     const stars = document.querySelectorAll('.star-btn');
     const ratingInput = document.querySelector('#rating-value');
@@ -11,11 +44,9 @@ $(document).ready(function () {
             star.addEventListener('mouseenter', function () {
                 highlightStars(parseInt(this.dataset.value));
             });
-
             star.addEventListener('mouseleave', function () {
                 highlightStars(parseInt(ratingInput.value));
             });
-
             star.addEventListener('click', function () {
                 const value = parseInt(this.dataset.value);
                 ratingInput.value = value;
@@ -70,14 +101,22 @@ $(document).ready(function () {
                         const noReviewsMsg = document.querySelector('#no-reviews-msg');
                         if (noReviewsMsg) noReviewsMsg.remove();
 
-                        // Build star HTML for new review
+                        // Update review count display
+                        const countDisplay = document.querySelector('#review-count-display');
+                        if (countDisplay) {
+                            const currentCount = document.querySelectorAll('#reviews-list .mb-3').length;
+                            const newCount = currentCount + 1;
+                            countDisplay.textContent = '— ' + response.rating + '/5 (' + newCount + ' review' + (newCount > 1 ? 's' : '') + ')';
+                        }
+
+                        // Build star HTML
                         let starsHtml = '';
                         for (let i = 1; i <= 5; i++) {
                             const filled = i <= response.rating ? '-fill' : '';
                             starsHtml += `<i class="bi bi-star${filled} text-accent" style="font-size:0.9rem;"></i>`;
                         }
 
-                        // Build new review HTML and prepend to reviews list
+                        // Append new review to list
                         const newReview = `
                             <div class="mb-3 p-3" style="background:var(--bg-input); border-radius:var(--radius);">
                                 <div class="d-flex justify-content-between align-items-center mb-1">
@@ -93,7 +132,6 @@ $(document).ready(function () {
                             reviewsList.insertAdjacentHTML('afterbegin', newReview);
                         }
 
-                        // Hide the form
                         reviewForm.closest('div').style.display = 'none';
 
                     } else {
@@ -127,24 +165,6 @@ $(document).ready(function () {
         });
     }
 
-    function updateNavCartBadge(count) {
-        const cartLink = document.querySelector('.navbar a[href="/cart/"]');
-        if (!cartLink) return;
-        let badge = cartLink.querySelector('.badge');
-        if (count > 0) {
-            if (badge) {
-                badge.textContent = count;
-            } else {
-                badge = document.createElement('span');
-                badge.className = 'badge bg-warning text-dark ms-1';
-                badge.textContent = count;
-                cartLink.appendChild(badge);
-            }
-        } else {
-            if (badge) badge.remove();
-        }
-    }
-
     // AJAX add to wishlist
     const wishlistBtn = document.querySelector('#add-to-wishlist');
     if (wishlistBtn) {
@@ -162,19 +182,6 @@ $(document).ready(function () {
                 }
             });
         });
-    }
-
-    // Helper: show message
-    function showMessage(selector, text, type) {
-        const el = document.querySelector(selector);
-        el.style.display = 'block';
-        el.className = 'alert alert-' + type + ' mt-2';
-        el.textContent = text;
-    }
-
-    // Helper: get CSRF token
-    function getCsrf() {
-        return document.querySelector('[name=csrfmiddlewaretoken]').value;
     }
 
 });
