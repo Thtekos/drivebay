@@ -4,6 +4,7 @@
 {% block title %}{{ car }} — DriveBay{% endblock %}
 
 {% block content %}
+{% csrf_token %}
 <div class="container py-5">
     <div class="row g-5">
 

@@ -32,7 +32,10 @@ $(document).ready(function () {
 
     // Helper: get CSRF token
     function getCsrf() {
-        return document.querySelector('[name=csrfmiddlewaretoken]').value;
+        const el = document.querySelector('[name=csrfmiddlewaretoken]');
+        if (el) return el.value;
+        const cookie = document.cookie.split(';').find(c => c.trim().startsWith('csrftoken='));
+        return cookie ? cookie.trim().split('=')[1] : '';
     }
 
     // Star rating hover and click
