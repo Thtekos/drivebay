@@ -20,7 +20,7 @@ $(document).ready(function () {
                             cartItem.remove();
                             document.querySelector('#cart-count-display').textContent = response.cart_count;
                             document.querySelector('#cart-total-display').textContent = '€' + response.total;
-                            updateNavCartBadge(response.cart_count);
+                            window.updateNavCartBadge(response.cart_count);
                             if (response.cart_count === 0) {
                                 location.reload();
                             }
