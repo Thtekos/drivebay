@@ -451,7 +451,9 @@ def cart_view(request):
 @login_required_redirect
 @require_POST
 def cart_add(request, car_id):
-    car = get_object_or_404(Car, id=car_id, is_available=True)
+    car = get_object_or_404(Car, id=car_id)
+    if not car.is_available:
+        return JsonResponse({'success': False, 'error': 'This car has already been sold.'})
 
     # Check if already in cart
     if request.user.cart_items.filter(car=car).exists():
