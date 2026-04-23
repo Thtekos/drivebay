@@ -6,18 +6,13 @@ $(document).ready(function () {
     function updateNavCartBadge(count) {
         const cartLink = document.querySelector('.navbar a[href="/cart/"]');
         if (!cartLink) return;
-        let badge = cartLink.querySelector('.badge');
+        // Remove ALL existing badges first then add fresh one
+        cartLink.querySelectorAll('.badge').forEach(b => b.remove());
         if (count > 0) {
-            if (badge) {
-                badge.textContent = count;
-            } else {
-                badge = document.createElement('span');
-                badge.className = 'badge bg-warning text-dark ms-1';
-                badge.textContent = count;
-                cartLink.appendChild(badge);
-            }
-        } else {
-            if (badge) badge.remove();
+            const badge = document.createElement('span');
+            badge.className = 'badge bg-warning text-dark ms-1';
+            badge.textContent = count;
+            cartLink.appendChild(badge);
         }
     }
 
