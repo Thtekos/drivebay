@@ -99,24 +99,6 @@ $(document).ready(function () {
                         const noReviewsMsg = document.querySelector('#no-reviews-msg');
                         if (noReviewsMsg) noReviewsMsg.remove();
 
-                        // Update review count display
-                        const countDisplay = document.querySelector('#review-count-display');
-                            if (countDisplay) {
-                                // Count after insertion by adding 1 to current DOM count
-                                const currentCount = document.querySelectorAll('#reviews-list .mb-3').length;
-                                const newCount = currentCount + 1;
-                                // Recalculate average including new rating
-                                const currentText = countDisplay.textContent;
-                                const avgMatch = currentText.match(/[\d.]+\/5/);
-                                let newAvg = response.rating;
-                                if (avgMatch && currentCount > 0) {
-                                    const currentAvg = parseFloat(avgMatch[0]);
-                                    newAvg = ((currentAvg * currentCount) + parseInt(response.rating)) / newCount;
-                                    newAvg = Math.round(newAvg * 10) / 10;
-                                }
-                                countDisplay.textContent = '— ' + newAvg + '/5 (' + newCount + ' review' + (newCount > 1 ? 's' : '') + ')';
-                            }
-
                         // Build star HTML
                         let starsHtml = '';
                         for (let i = 1; i <= 5; i++) {
@@ -124,7 +106,7 @@ $(document).ready(function () {
                             starsHtml += `<i class="bi bi-star${filled} text-accent" style="font-size:0.9rem;"></i>`;
                         }
 
-                        // Append new review to list
+                        // Insert new review into DOM FIRST
                         const newReview = `
                             <div class="mb-3 p-3" style="background:var(--bg-input); border-radius:var(--radius);">
                                 <div class="d-flex justify-content-between align-items-center mb-1">
@@ -140,6 +122,22 @@ $(document).ready(function () {
                             reviewsList.insertAdjacentHTML('afterbegin', newReview);
                         }
 
+                        // NOW count reviews after insertion
+                        const countDisplay = document.querySelector('#review-count-display');
+                        if (countDisplay) {
+                            const newCount = document.querySelectorAll('#reviews-list .mb-3').length;
+                            const currentText = countDisplay.textContent;
+                            const avgMatch = currentText.match(/[\d.]+\/5/);
+                            let newAvg = response.rating;
+                            if (avgMatch && newCount > 1) {
+                                const currentAvg = parseFloat(avgMatch[0]);
+                                newAvg = ((currentAvg * (newCount - 1)) + parseInt(response.rating)) / newCount;
+                                newAvg = Math.round(newAvg * 10) / 10;
+                            }
+                            countDisplay.textContent = '— ' + newAvg + '/5 (' + newCount + ' review' + (newCount > 1 ? 's' : '') + ')';
+                        }
+
+                        // Hide the form
                         reviewForm.closest('div').style.display = 'none';
 
                     } else {
