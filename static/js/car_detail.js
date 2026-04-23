@@ -101,11 +101,21 @@ $(document).ready(function () {
 
                         // Update review count display
                         const countDisplay = document.querySelector('#review-count-display');
-                        if (countDisplay) {
-                            const currentCount = document.querySelectorAll('#reviews-list .mb-3').length;
-                            const newCount = currentCount + 1;
-                            countDisplay.textContent = '— ' + response.rating + '/5 (' + newCount + ' review' + (newCount > 1 ? 's' : '') + ')';
-                        }
+                            if (countDisplay) {
+                                // Count after insertion by adding 1 to current DOM count
+                                const currentCount = document.querySelectorAll('#reviews-list .mb-3').length;
+                                const newCount = currentCount + 1;
+                                // Recalculate average including new rating
+                                const currentText = countDisplay.textContent;
+                                const avgMatch = currentText.match(/[\d.]+\/5/);
+                                let newAvg = response.rating;
+                                if (avgMatch && currentCount > 0) {
+                                    const currentAvg = parseFloat(avgMatch[0]);
+                                    newAvg = ((currentAvg * currentCount) + parseInt(response.rating)) / newCount;
+                                    newAvg = Math.round(newAvg * 10) / 10;
+                                }
+                                countDisplay.textContent = '— ' + newAvg + '/5 (' + newCount + ' review' + (newCount > 1 ? 's' : '') + ')';
+                            }
 
                         // Build star HTML
                         let starsHtml = '';
