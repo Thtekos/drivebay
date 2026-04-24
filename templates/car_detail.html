@@ -68,11 +68,9 @@
             <div class="car-card p-4">
                 <h5 style="color: var(--text-primary); font-weight: 700; margin-bottom: 1.5rem;">
                     <i class="bi bi-star-fill text-accent me-2"></i>Reviews
-                    {% if car.average_rating %}
-                        <span style="font-size: 0.9rem; color: var(--text-muted);">
-                            — {{ car.average_rating }}/5 ({{ reviews.count }} review{{ reviews.count|pluralize }})
-                        </span>
-                    {% endif %}
+                    <span id="review-count-display" style="font-size: 0.9rem; color: var(--text-muted);">
+                        {% if car.average_rating %}— {{ car.average_rating }}/5 ({{ reviews.count }} review{{ reviews.count|pluralize }}){% endif %}
+                    </span>
                 </h5>
 
                 {% if user.is_authenticated and not user_review %}
